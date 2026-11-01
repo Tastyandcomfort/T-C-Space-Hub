@@ -1,0 +1,13 @@
+{
+  "name": "T&C Space Hub",
+  "short_name": "Space Hub",
+  "description": "Explore satellites, deep-space missions and space weather.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#101114",
+  "theme_color": "#f5f5f7",
+  "icons": [
+    { "src": "assets/space-hub-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "assets/space-hub-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
