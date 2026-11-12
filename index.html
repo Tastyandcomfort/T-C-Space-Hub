@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0b1020">
+  <meta name="description" content="T&C Space Hub — Earth and space monitoring using public scientific data.">
+  <title>T&C Space Hub — Earth & Space Observatory</title>
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="preconnect" href="https://services.swpc.noaa.gov">
+  <link rel="preconnect" href="https://earthquake.usgs.gov">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="T&C Space Hub home">
+        <span class="brand-mark">T&C</span>
+        <span><strong>SPACE HUB</strong><small>EARTH & SPACE OBSERVATORY</small></span>
+      </a>
+      <div class="top-actions">
+        <span class="live-indicator"><i></i> LIVE DATA CONNECTION</span>
+        <button id="themeBtn" class="icon-btn" aria-label="Toggle theme">☼</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div>
+          <p class="eyebrow">FROM NEW MODERN MISSION</p>
+          <h1>Observe our planet.<br><span>Explore the universe.</span></h1>
+          <p class="hero-copy">A live window into Earth systems, space weather and our orbital neighbourhood — powered by public scientific data.</p>
+        </div>
+        <div class="hero-meta">
+          <div class="meta-label">YOUR OBSERVATORY</div>
+          <div class="meta-value" id="utcClock">--:--:-- UTC</div>
+          <div class="meta-sub" id="localClock">Loading local time…</div>
+        </div>
+      </section>
+
+      <section class="status-grid" aria-label="Live data summary">
+        <article class="metric-card">
+          <div class="metric-top"><span>GEOMAGNETIC ACTIVITY</span><span class="metric-icon">◉</span></div>
+          <div class="metric-value" id="kpValue">—</div>
+          <div class="metric-foot" id="kpStatus">Waiting for NOAA data</div>
+        </article>
+        <article class="metric-card">
+          <div class="metric-top"><span>EARTHQUAKES · PAST 24H</span><span class="metric-icon">⌁</span></div>
+          <div class="metric-value" id="quakeCount">—</div>
+          <div class="metric-foot" id="quakeStatus">Waiting for USGS data</div>
+        </article>
+        <article class="metric-card">
+          <div class="metric-top"><span>OPEN EARTH EVENTS</span><span class="metric-icon">◎</span></div>
+          <div class="metric-value" id="eventCount">—</div>
+          <div class="metric-foot" id="eventStatus">Waiting for NASA EONET</div>
+        </article>
+        <article class="metric-card">
+          <div class="metric-top"><span>DATA REFRESH</span><span class="metric-icon">↻</span></div>
+          <div class="metric-value compact" id="lastRefresh">—</div>
+          <div class="metric-foot">Automatic refresh · source-dependent</div>
+        </article>
+      </section>
+
+      <section class="section-heading">
+        <div><p class="eyebrow">PLANETARY VIEW</p><h2>Earth monitoring</h2></div>
+        <div class="view-switch">
+          <button class="switch-btn active" data-view="map">2D MAP</button>
+          <button class="switch-btn" data-view="globe">3D GLOBE</button>
+        </div>
+      </section>
+
+      <section class="map-panel panel">
+        <div class="panel-heading">
+          <div><h3 id="mapTitle">Global events map</h3><p>Earthquakes and NASA-reported natural events</p></div>
+          <div class="map-legend"><span><i class="dot quake"></i> Earthquake</span><span><i class="dot event"></i> Natural event</span></div>
+        </div>
+        <div id="mapView" class="map-view"></div>
+        <div id="globeView" class="globe-view hidden"><div id="globeViz"></div></div>
+        <div class="map-foot"><span>Map markers are based on the latest data returned by source APIs.</span><span id="mapUpdated">Not yet updated</span></div>
+      </section>
+
+      <section class="content-grid">
+        <article class="panel data-panel">
+          <div class="panel-heading"><div><p class="eyebrow">SPACE WEATHER</p><h3>Geomagnetic conditions</h3></div><span class="source-tag">NOAA SWPC</span></div>
+          <div class="big-reading"><span id="kpLarge">—</span><small>Kp index</small></div>
+          <p class="muted" id="kpExplanation">The planetary Kp index describes disturbances in Earth's magnetic field.</p>
+          <div class="bar-track"><div id="kpBar" class="bar-fill"></div></div>
+          <div class="scale-labels"><span>Quiet · 0</span><span>Severe · 9</span></div>
+          <div class="timestamp" id="kpTime">Source timestamp: waiting</div>
+        </article>
+
+        <article class="panel data-panel">
+          <div class="panel-heading"><div><p class="eyebrow">RECENT ACTIVITY</p><h3>Earthquakes</h3></div><span class="source-tag">USGS</span></div>
+          <div class="list" id="quakeList"><div class="empty-state">Loading earthquake feed…</div></div>
+          <a class="text-link" href="https://earthquake.usgs.gov/earthquakes/feed/" target="_blank" rel="noopener">Explore USGS earthquake feeds ↗</a>
+        </article>
+
+        <article class="panel data-panel">
+          <div class="panel-heading"><div><p class="eyebrow">PLANETARY EVENTS</p><h3>NASA Earth events</h3></div><span class="source-tag">NASA EONET</span></div>
+          <div class="list" id="eventList"><div class="empty-state">Loading open events…</div></div>
+          <a class="text-link" href="https://eonet.gsfc.nasa.gov/" target="_blank" rel="noopener">Explore NASA EONET ↗</a>
+        </article>
+
+        <article class="panel data-panel">
+          <div class="panel-heading"><div><p class="eyebrow">SOLAR OBSERVATORY</p><h3>Solar activity feed</h3></div><span class="source-tag">NOAA</span></div>
+          <div class="list" id="solarList"><div class="empty-state">Loading solar region data…</div></div>
+          <a class="text-link" href="https://www.swpc.noaa.gov/" target="_blank" rel="noopener">Explore NOAA Space Weather ↗</a>
+        </article>
+      </section>
+
+      <section class="section-heading">
+        <div><p class="eyebrow">MISSION CONTROL</p><h2>Explore trusted data sources</h2></div>
+      </section>
+      <section class="source-grid">
+        <a class="source-card" href="https://api.nasa.gov/" target="_blank" rel="noopener"><span class="source-symbol">NASA</span><strong>NASA Open APIs</strong><small>Solar events, asteroids and astronomy data</small><b>Open source ↗</b></a>
+        <a class="source-card" href="https://mosdac.gov.in/" target="_blank" rel="noopener"><span class="source-symbol">ISRO</span><strong>ISRO MOSDAC</strong><small>Indian weather, ocean and satellite products</small><b>Open portal ↗</b></a>
+        <a class="source-card" href="https://dataspace.copernicus.eu/" target="_blank" rel="noopener"><span class="source-symbol">ESA</span><strong>Copernicus Data Space</strong><small>Sentinel Earth-observation imagery</small><b>Open data ↗</b></a>
+        <a class="source-card" href="https://celestrak.org/" target="_blank" rel="noopener"><span class="source-symbol">ORBIT</span><strong>CelesTrak</strong><small>Public satellite orbital elements</small><b>Open catalogue ↗</b></a>
+        <a class="source-card" href="https://firms.modaps.eosdis.nasa.gov/" target="_blank" rel="noopener"><span class="source-symbol">FIRMS</span><strong>NASA FIRMS</strong><small>Satellite-based active fire detections</small><b>Free key required ↗</b></a>
+        <a class="source-card" href="https://gibs.earthdata.nasa.gov/" target="_blank" rel="noopener"><span class="source-symbol">GIBS</span><strong>NASA GIBS</strong><small>Global satellite imagery and map layers</small><b>Explore layers ↗</b></a>
+      </section>
+
+      <section class="notice panel">
+        <div class="notice-icon">ⓘ</div>
+        <div><strong>Scientific data, with transparent limitations</strong><p>“Live” means the latest data published by each provider. Some feeds are near-real-time, delayed, forecast-based or periodically updated. Satellite orbital positions calculated from TLE/OMM data are predictions, not live GPS telemetry. ISRO MOSDAC and some NASA services may require registration, access approval or API keys for programmatic use.</p></div>
+      </section>
+    </main>
+
+    <footer><span>© T&C · From New Modern Mission</span><span>Built for exploration · Public data sources credited above</span></footer>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/globe.gl"></script>
+  <script src="app.js"></script>
+</body>
+</html>
